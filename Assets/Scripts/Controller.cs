@@ -6,14 +6,12 @@ public class Controller : MonoBehaviour
     [SerializeField] float m_jumpForce = 7.5f;
     [SerializeField] float fallThreshold = 3.5f;
 
-
     public LayerMask enemyLayers;
     public Transform attackPoint;
     public float attackRange = 1f;
     public int attackDamage;
     public float attackRate = 2f;
     float nextAttackTime = 0f;
-
 
     private Animator m_animator;
     private Rigidbody2D m_body2d;
