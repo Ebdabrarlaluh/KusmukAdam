@@ -11,11 +11,11 @@ public class Enemy : MonoBehaviour
     public float moveSpeed = 0.1f;
     public int health = 100;
 
-    public float attackRange = 4f; // Oyuncuya saldırmak için yaklaşma mesafesi
+    public float attackRange = 4f; 
     public float attackRate = 1f;
     float nextAttackTime = 0f;
 
-    private bool isDead = false; // Yaratığın ölüp ölmediğini takip eden değişken
+    private bool isDead = false; 
 
     private float hurtTime = 0f;
     private float hurtWaitTime = 0.5f;
@@ -47,16 +47,15 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
-        // Saldırı animasyonunu çalıştır
+        
         animator.SetTrigger("Attack");
         animator.SetBool("IsWalking", false);
         nextAttackTime = Time.time + 1f / attackRate;
-        // Saldırı işlemleri burada yapılabilir
     }
 
     public void TakeDamage(int damage)
     {
-        if (isDead) // Eğer yaratık öldüyse artık zarar almayı durdur
+        if (isDead)
             return;
 
         health -= damage;
@@ -72,6 +71,7 @@ public class Enemy : MonoBehaviour
 
     void Walk()
     {
+        // Follow the player
         Vector3 targetPosition = new Vector3(playerTransform.position.x, transform.position.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
         animator.SetBool("IsWalking", true);
@@ -81,22 +81,22 @@ public class Enemy : MonoBehaviour
     {
         if (playerTransform.position.x > transform.position.x)
         {
-            transform.localScale = new Vector3(1f, 1f, 1f); // Sağa dön
+            transform.localScale = new Vector3(1f, 1f, 1f); // turn right
         }
         else
         {
-            transform.localScale = new Vector3(-1f, 1f, 1f); // Sola dön
+            transform.localScale = new Vector3(-1f, 1f, 1f); // turn left
         }
     }
     void Die()
     {
         //Instantiate(deathEffect, transform.position, Quaternion.identity);
-        isDead = true; // Yaratığın öldüğünü işaretle
+
+        isDead = true; 
         animator.SetBool("IsDead", true);
         GetComponent<Collider2D>().enabled = false;
         GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
         this.enabled = false;
-        //GetComponent<Rigidbody2D>().gravityScale = 0
     }
 
     
