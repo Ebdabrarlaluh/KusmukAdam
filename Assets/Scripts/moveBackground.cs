@@ -30,7 +30,7 @@ public class moveBackground : MonoBehaviour
         }
         if (transform.position.x < -10f || transform.position.x > 10f)
         {
-            //if object moves away, destroy
+            //if object moves away, destroy (for optimizing)
             Destroy(gameObject); 
         }
     }
