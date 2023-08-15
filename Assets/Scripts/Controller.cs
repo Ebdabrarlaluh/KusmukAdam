@@ -31,7 +31,7 @@ public class Controller : MonoBehaviour
     void Update()
     {
 
-        
+        //Ground Sensor
 
         if (!m_grounded && m_groundSensor.State())
         {
@@ -59,6 +59,8 @@ public class Controller : MonoBehaviour
         }
 
 
+        //Movement
+
         float inputX = Input.GetAxis("Horizontal");
 
         if (inputX > 0)
@@ -69,22 +71,33 @@ public class Controller : MonoBehaviour
         m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
         m_animator.SetFloat("AirSpeed", m_body2d.velocity.y);
 
+        //Death
+
         if (Input.GetKeyDown("e"))
         {
             if (!m_isDead)
                 m_animator.SetTrigger("Death");
             m_isDead = !m_isDead;
         }
+
+        //Hurt
+
         else if (Input.GetKeyDown("q"))
             m_animator.SetTrigger("Hurt");
+
+        //Attack
+
         else if (Time.time >= nextAttackTime && Input.GetMouseButtonDown(0))
         {
-            Attack();
             nextAttackTime = Time.time + 1f / attackRate;
             m_animator.SetTrigger("Attack");
-            Invoke("Attack", 0.2f);
+
+            Invoke("Attack", 0.15f);
+
+            Invoke("Attack", 0.15f);
         }
             
+        //Jump
 
         else if (Input.GetKeyDown("space") && m_grounded)
         {
@@ -94,6 +107,8 @@ public class Controller : MonoBehaviour
             m_animator.SetBool("isJumping",true);
             m_groundSensor.Disable(0.2f);
         }
+
+        //Idle
         else if (Mathf.Abs(inputX) > Mathf.Epsilon)
             m_animator.SetInteger("AnimState", 1);
         else
@@ -102,7 +117,7 @@ public class Controller : MonoBehaviour
 
     void Attack()
     {
-        
+        //Select all enemies in range
         Collider2D[] hitEnemies= Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
         foreach(Collider2D enemy in hitEnemies)
@@ -113,10 +128,10 @@ public class Controller : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-
+        
         if (attackPoint == null)
             return;
-
+        //Range for visualize in unity
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
 
     }
