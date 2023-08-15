@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    Rigidbody2D rb;
+    public Animator animator;
+    private Transform playerTransform;
 
     public float moveSpeed = 0.1f;
     public int health = 100;
-    Rigidbody2D rb;
-    public Animator animator;
-    private bool isDead = false; // Yaratığın ölüp ölmediğini takip eden değişken
-    private Transform playerTransform;
+
     public float attackRange = 4f; // Oyuncuya saldırmak için yaklaşma mesafesi
-    public float attackRate = 2f;
+    public float attackRate = 1f;
     float nextAttackTime = 0f;
 
+    private bool isDead = false; // Yaratığın ölüp ölmediğini takip eden değişken
+
+    private float hurtTime = 0f;
+    private float hurtWaitTime = 0.5f;
     private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
@@ -22,46 +26,31 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        // Oyuncunun X koordinatına doğru hareket et
-        Vector3 targetPosition = new Vector3(playerTransform.position.x, transform.position.y, transform.position.z);
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
-        if (playerTransform.position.x > transform.position.x)
+        if (Time.time-hurtTime >= hurtWaitTime)
         {
-            transform.localScale = new Vector3(1f, 1f, 1f); // Sağa dön
-        }
-        else
-        {
-            transform.localScale = new Vector3(-1f, 1f, 1f); // Sola dön
-        }
-
-       
-        if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange )
-        {
-            if (Time.time >= nextAttackTime)
+            if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange )
             {
-                Attack();
-                nextAttackTime = Time.time + 1f / attackRate;
-                Debug.Log("sad");
+                if (Time.time >= nextAttackTime)
+                {
+                    Attack();
+                }  
             }
-
-            else 
-                animator.SetBool("IsAttacking", false);
-
-        }
-        else
-        {
-            // Saldırı yapmıyorsa, saldırı animasyonunu durdur
-            animator.SetBool("IsAttacking", false);
+            else
+            {
+                Walk();
+            }
         }
 
     }
 
+
     private void Attack()
     {
         // Saldırı animasyonunu çalıştır
-        animator.SetBool("IsAttacking", true);
-
+        animator.SetTrigger("Attack");
+        animator.SetBool("IsWalking", false);
+        nextAttackTime = Time.time + 1f / attackRate;
         // Saldırı işlemleri burada yapılabilir
     }
 
@@ -72,12 +61,33 @@ public class Enemy : MonoBehaviour
 
         health -= damage;
         animator.SetTrigger("Hurt");
+        animator.SetBool("IsWalking", false);
+        hurtTime = Time.time;
+
         if (health <= 0)
         {
             Die();
         }
     }
 
+    void Walk()
+    {
+        Vector3 targetPosition = new Vector3(playerTransform.position.x, transform.position.y, transform.position.z);
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        animator.SetBool("IsWalking", true);
+        Turn();
+    }
+    void Turn()
+    {
+        if (playerTransform.position.x > transform.position.x)
+        {
+            transform.localScale = new Vector3(1f, 1f, 1f); // Sağa dön
+        }
+        else
+        {
+            transform.localScale = new Vector3(-1f, 1f, 1f); // Sola dön
+        }
+    }
     void Die()
     {
         //Instantiate(deathEffect, transform.position, Quaternion.identity);
